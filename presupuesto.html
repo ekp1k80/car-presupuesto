@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Presupuesto de auto</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+      }
+
+      h1 {
+          text-align: center;
+          margin-top: 20px;
+      }
+
+      form {
+          max-width: 500px;
+          margin: 0 auto;
+          padding: 20px;
+          border: 1px solid #ccc;
+          background-color: #fff;
+      }
+
+      #es0km {
+          width: 40px;
+          height: 40px;
+      }
+
+      label {
+          display: block;
+          margin-bottom: 10px;
+      }
+
+      input[type="number"] {
+          width: 100%;
+          padding: 5px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      input[type="checkbox"] {
+          margin-right: 10px;
+      }
+
+      button[type="button"] {
+          display: block;
+          margin: 0 auto;
+          padding: 10px 20px;
+          background-color: #4caf50;
+          color: #fff;
+          border: none;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 16px;
+      }
+
+      button[type="button"]:hover {
+          background-color: #3e8e41;
+      }
+
+      #valorMinimoCuota:disabled {
+          background-color: #8c8b8b;
+      }
+  </style>
+</head>
+<body>
+<h1>Presupuesto de auto</h1>
+<form>
+  <label>
+    <input type="checkbox" name="es0km" id="es0km">
+    Es 0KM
+  </label>
+  <label>
+    Precio final:
+    <input type="number" name="precioFinal" id="precioFinal" min="0">
+  </label>
+  <label>
+    Descuento (%):
+    <input type="number" name="descuento" id="descuento" min="0" max="100">
+  </label>
+  <label>
+    Entrega del cliente:
+    <input type="number" name="entregaCliente" id="entregaCliente" min="0">
+  </label>
+  <label>
+    Valor mínimo de cuota:
+    <input type="number" name="valorMinimoCuota" id="valorMinimoCuota" min="0" disabled>
+  </label>
+  <label>
+    Cantidad de cuotas para cancelación:
+    <input type="number" name="cantidadCuotas" id="cantidadCuotas" min="0">
+  </label>
+  <label>
+    Interes anual:
+    <input type="number" name="interesanual" id="interesanual" min="0">
+  </label>
+  <button type="button" onclick="calcularPresupuesto()">Calcular presupuesto</button>
+</form>
+<div id="resultado" style="max-width: 500px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; background-color: #fff;"></div>
+<script>
+  const es0kmCheckbox = document.getElementById("es0km");
+  const valorMinimoCuotaInput = document.getElementById("valorMinimoCuota");
+
+  es0kmCheckbox.addEventListener("change", function() {
+    valorMinimoCuotaInput.disabled = !this.checked;
+  });
+
+  function convertMonthsToYears(meses) {
+    const years = Math.floor(meses / 12);
+    const remainingMonths = meses % 12;
+    let yearsText = "";
+    let monthsText = "";
+
+    if (years === 1) {
+      yearsText = "1 año";
+    } else if (years > 1) {
+      yearsText = `${years} años`;
+    }
+
+    if (remainingMonths === 1) {
+      monthsText = "1 mes";
+    } else if (remainingMonths > 1) {
+      monthsText = `${remainingMonths} meses`;
+    }
+
+    if (yearsText && monthsText) {
+      return `${yearsText} y ${monthsText}`;
+    } else if (yearsText) {
+      return yearsText;
+    } else if (monthsText) {
+      return monthsText;
+    } else {
+      return "0 meses";
+    }
+  }
+
+  function calcularPresupuesto() {
+    const precioFinal = parseFloat(document.getElementById("precioFinal").value);
+    const descuento = parseFloat(document.getElementById("descuento").value);
+    const entregaCliente = parseFloat(document.getElementById("entregaCliente").value);
+    const valorMinimoCuota = parseFloat(document.getElementById("valorMinimoCuota").value);
+    const cantidadCuotas = parseFloat(document.getElementById("cantidadCuotas").value);
+    const interesAnual = parseFloat(document.getElementById("interesanual").value);
+
+    const promocion = ((descuento / 100) * precioFinal)
+    const precioMenosPromocion = precioFinal - promocion;
+    const precioFinalMenosPromocionMenosEntrega = precioMenosPromocion - entregaCliente;
+
+    let facturacionFinal = precioFinalMenosPromocionMenosEntrega;
+
+
+
+    let resultado = `
+      <p>VALOR DE 0KM: $${precioFinal.toLocaleString()}</p>
+      <p>ENTREGA: $${entregaCliente.toLocaleString()}</p>
+      <p>PROMOCION: $${promocion.toLocaleString()}</p>
+      <p>$${precioFinal.toLocaleString()} - $${promocion.toString()} = ${precioMenosPromocion.toLocaleString()}</p>
+      <p>$${precioMenosPromocion.toLocaleString()} - $${entregaCliente.toLocaleString()} = $${precioFinalMenosPromocionMenosEntrega.toLocaleString()}</p>
+    `;
+
+
+    if (es0kmCheckbox.checked) {
+
+      resultado = resultado + `
+      <p>CUOTA MINIMA PARA DESCUENTO: $${valorMinimoCuota.toLocaleString()}</p>
+      <p>DESCUENTO CUOTAS 0KM: $${valorMinimoCuota.toLocaleString()} x 3 = $${(valorMinimoCuota * 3).toLocaleString()}</p>
+      <p>DESCUENTO CUOTAS 0KM: CUOTA MININA: $${valorMinimoCuota.toLocaleString()} x 3 = $${(valorMinimoCuota * 3).toLocaleString()}</p>
+      <p>PRECIO CON DESCUENTO DE CUOTAS: $${facturacionFinal.toLocaleString()} - $${(valorMinimoCuota * 3)} = $${(facturacionFinal - (valorMinimoCuota * 3)).toLocaleString()}</p>
+    `;
+      facturacionFinal = facturacionFinal - (valorMinimoCuota * 3);
+    }
+
+    const valorCuota = facturacionFinal / cantidadCuotas;
+
+    resultado = resultado + `
+    <p>VALOR DE CUOTA: $${facturacionFinal.toLocaleString()} dividido ${cantidadCuotas} = $${valorCuota.toLocaleString()}</p>
+    <p>Facturación final: ${cantidadCuotas} cuotas de $${valorCuota.toLocaleString()}</p>
+    <p>Cancelación: ${convertMonthsToYears(cantidadCuotas)}.</p>
+    <p>${interesAnual}% DE INTERES ANUAL SOBRE LA VARIACION DE LA CUOTA INICIAL.</p>
+    <p>$${valorCuota.toLocaleString()} X ${interesAnual} DIVIDIDO A 100 = $${valorCuota * 12 / 100} ANUAL</p>
+    <p>$${valorCuota * 12 / 100} DIVIDIDO A 12 MESES = $${valorCuota * 12 / 100 / 12} MENSUAL</p>
+    <button id="btn-copiar" type="button">Copiar resultado</button>
+    `
+    const resultadoDiv = document.getElementById("resultado");
+    resultadoDiv.innerHTML = resultado;
+    resultadoDiv.style.display = "block";
+
+    const btnCopiar = document.getElementById("btn-copiar");
+    btnCopiar.addEventListener("click", function() {
+      const resultadoTexto = resultadoDiv.innerText;
+
+      const textarea = document.createElement("textarea");
+      textarea.value = resultadoTexto;
+      document.body.appendChild(textarea);
+
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+
+      alert("El resultado se ha copiado al portapapeles.");
+    });
+  }
+</script>
+</body>
+</html>
